@@ -15,6 +15,18 @@ def load_event_data(filepath):
     events = pd.read_csv(filepath, parse_dates=['Date'])
     return events
 
+def describe_data(df):
+    print(df['Price'].describe())
+    print("\nMissing values:", df['Price'].isna().sum())
+    print("\nDate Range:", df['Date'].min(), "to", df['Date'].max())
+
+def detect_outliers(df, threshold=0.1):
+    df = df.copy()
+    df['LogReturn'] = np.log(df['Price']).diff()
+    outliers = df[np.abs(df['LogReturn']) > threshold]
+    print(f"Detected {len(outliers)} extreme return days (>{threshold})")
+    return outliers
+
 def plot_price(df, events=None):
     """Plot oil price over time, with optional events."""
     plt.figure(figsize=(15,5))
@@ -38,6 +50,18 @@ def plot_rolling(df, window=30):
     plt.title(f'Brent Oil Price with {window}-Day Rolling Mean')
     plt.xlabel('Date')
     plt.ylabel('Price (USD/barrel)')
+    plt.legend()
+    plt.show()
+def plot_rolling_volatility(df, window=30):
+    df = df.copy()
+    df['LogReturn'] = np.log(df['Price']).diff()
+    df['RollingVolatility'] = df['LogReturn'].rolling(window).std()
+
+    plt.figure(figsize=(15,4))
+    plt.plot(df['Date'], df['RollingVolatility'], label=f'{window}-Day Rolling Std (Volatility)', color='purple')
+    plt.title(f'Volatility Clustering Over Time ({window}-Day Rolling)')
+    plt.xlabel('Date')
+    plt.ylabel('Volatility')
     plt.legend()
     plt.show()
 
