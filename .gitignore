@@ -4,9 +4,11 @@ data
 __pycache__/
 *.py[codz]
 *$py.class
-
+.venv310
 # C extensions
 *.so
+.venv310
+.venv310/
 
 # Distribution / packaging
 .Python
